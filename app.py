@@ -129,8 +129,8 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 </form></div>
 
 {% for r in rows %}
-<div class="card">
-<a href="/edit/{{r['id']}}" style="background:#ff9800;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;fonpx;border-radius:8px;text-decoration:none;font-size:13px;font-weight:bold;display:block;text-align:center;margin-top:6px;">✏️ EDIT - BETULKAN</a>center;margin-top:6px;">✏️ EDIT - BETULKAN</a>
+<div class="card">text-align:center;margin-top:6px;">✏️ EDIT - B
+<a href="/edit/{{r['id']}}" style="background:#ff9800;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;fonpx;border-radius:8px;text-decoration:none;font-size:13px;font-weight:bold;display:block;BETULKAN</a><a href="/edit/{{r['id']}}" style="display:block;text-align:left;margin-top:0;margin-left:0;padding:10px;"><✏️ EDIT - BETULKAN</a>
 <b>{{r['jenis']}} - {{r['plat']}}</b><br>
 👤 {{r['customer']}} - {{r['phone']}}<br>
 🔧 {{r['masalah']}}<br>
@@ -214,3 +214,4 @@ def update(id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
