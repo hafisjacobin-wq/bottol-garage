@@ -134,6 +134,7 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 👤 {{r['customer']}} - {{r['phone']}}<br>
 🔧 {{r['masalah']}}<br>
 💰 RM{{r['harga'] or 0}} | Pomen: {{r['pomen'] or '-'}} | Bayar: {{r['bayar']}}
+<a href="https://wa.me/{{r['phone']}}?text=Salam%20{{r['customer']}}%2C%20motor%20{{r['jenis']}}%20{{r['plat']}}%20kau%20DAH%20SIAP!%20Total%20RM{{r['harga']}}%20-%20Bottol%20Garage" target="_blank" style="display:block;background:#25D366;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:8px;">💬 WHATSAPP CUSTOMER</a>
 {% if r['status']=='Masuk' %}
 <form method="post" action="/kerja/{{r['id']}}"><input name="pomen" placeholder="Nama Pomen" required><button class="btn-kerja">🔧 MULA KERJA</button></form>
 {% elif r['status']=='Tengah Buat' %}
