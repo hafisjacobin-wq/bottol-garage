@@ -130,7 +130,8 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 
 {% for r in rows %}
 <div class="card">
-<b>{{r['jenis']}} {{r['plat']}}</b> <span class="badge" style="background:{% if r['status']=='Masuk' %}#ff9800{% elif r['status']=='Tengah Buat' %}#2196f3{% elif r['status']=='Tunggu Approval' %}red{% else %}#4caf50{% endif %}">{{r['status']}}</span><br>
+<a href="/edit/{{r['id']}}" style="background:#ff9800;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;fonpx;border-radius:8px;text-decoration:none;font-size:13px;font-weight:bold;display:block;text-align:center;margin-top:6px;">✏️ EDIT - BETULKAN</a>center;margin-top:6px;">✏️ EDIT - BETULKAN</a>
+<b>{{r['jenis']}} - {{r['plat']}}</b><br>
 👤 {{r['customer']}} - {{r['phone']}}<br>
 🔧 {{r['masalah']}}<br>
 💰 RM{{r['harga'] or 0}} | Pomen: {{r['pomen'] or '-'}} | Bayar: {{r['bayar']}}
@@ -185,7 +186,31 @@ def approve(id):
 @app.route("/bayar/<int:id>", methods=["POST"])
 def bayar(id):
     con=db(); con.execute("UPDATE motor SET bayar='Sudah' WHERE id=?",(id,)); con.commit(); con.close(); return redirect("/")
+@app.route("/edit/<int:id>")
+def edit(id):
+    con=db(); r=con.execute("SELECT * FROM motor WHERE id=?",(id,)).fetchone(); con.close()
+    return f"""
+    <div style="font-family:sans-serif;max-width:500px;margin:20px auto;padding:20px">
+    <h2>Edit Motor - {r['customer']}</h2>
+    <form action="/update/{id}" method="POST" style="display:flex;flex-direction:column;gap:10px">
+    Nama: <input name="customer" value="{r['customer']}" required>
+    No Phone: <input name="phone" value="{r['phone']}" required>
+    No Plat: <input name="plat" value="{r['plat']}" required>
+    Motor: <input name="jenis" value="{r['jenis']}" required>
+    Kerja: <input name="masalah" value="{r['masalah']}" required>
+    Harga RM: <input name="harga" type="number" value="{r['harga'] or 0}" required>
+    Pomen: <input name="pomen" value="{r['pomen'] or ''}">
+    <button style="background:#ff9800;color:white;padding:12px;border:none;border-radius:8px;font-weight:bold">SIMPAN BETULKAN</button>
+    <a href="/" style="text-align:center">Batal</a>
+    </form></div>
+    """
 
+@app.route("/update/<int:id>", methods=["POST"])
+def update(id):
+    con=db(); con.execute("UPDATE motor SET customer=?, phone=?, plat=?, jenis=?, masalah=?, harga=?, pomen=? WHERE id=?",
+    (request.form.get('customer'), request.form.get('phone'), request.form.get('plat'), request.form.get('jenis'), request.form.get('masalah'), request.form.get('harga'), request.form.get('pomen'), id))
+    con.commit(); con.close()
+    return redirect("/")
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
