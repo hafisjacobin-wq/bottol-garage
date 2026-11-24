@@ -45,20 +45,20 @@ def check_subscribe():
 # ================= PAGE SUBSCRIBE =================
 SUBSCRIBE_HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bottol Garage - Subscribe</title>
+<title>ARAPP SYSTEM Garage - Subscribe</title>
 <style>body{font-family:sans-serif;background:#111;padding:16px;margin:0;color:#111}
 .box{background:white;padding:22px;border-radius:16px;text-align:center;max-width:400px;margin:20px auto}
 .btn{display:block;background:#111;color:white;padding:16px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:18px;margin-top:12px}
 .btn2{display:block;background:#25D366;color:white;padding:14px;border-radius:10px;text-decoration:none;font-weight:bold;margin-top:10px}
 </style></head><body>
 <div class="box">
-<h1>🏍️ Bottol Garage</h1>
+<h1>🏍️ ARAPP SYSTEM Garage</h1>
 <h2 style="color:red">Trial Dah Habis Bro</h2>
 <p>Nak sambung guna untuk kedai kau?</p>
 <h1 style="font-size:42px">RM49 <span style="font-size:16px">/ Bulan</span></h1>
 <p style="text-align:left">✅ Unlimited Motor Masuk<br>✅ Unlimited Pomen<br>✅ Approval Tokey<br>✅ WhatsApp Customer Auto<br>✅ Rekod Duit Harian</p>
 <a class="btn" href="https://toyyibpay.com/LINK-KAU-GANTI-SINI">💳 BAYAR RM49 SEKARANG</a>
-<a class="btn2" href="https://wa.me/60123456789?text=Salam%20saya%20nak%20subscribe%20Bottol%20Garage%20RM49">📱 WHATSAPP ADMIN - DAH BAYAR</a>
+<a class="btn2" href="https://wa.me/60123456789?text=Salam%20saya%20nak%20subscribe%20Arapp%20Garage%20RM49">📱 WHATSAPP ADMIN - DAH BAYAR</a>
 <p style="font-size:12px;color:#888;margin-top:15px">Lepas bayar, WhatsApp resit kat admin, admin akan aktifkan dalam 5 minit.</p>
 </div></body></html>
 """
@@ -81,7 +81,7 @@ def aktifkan():
 # ================= PAGE UTAMA =================
 HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bottol Garage</title>
+<title>ARAPPSYSTEM Garage</title>
 <style>
 body{font-family:sans-serif;background:#f4f4f4;padding:12px;margin:0}
 h1{text-align:center}
@@ -97,7 +97,7 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 .top{display:flex;gap:8px;text-align:center}
 .top div{flex:1;background:white;padding:10px;border-radius:10px}
 </style></head><body>
-<h1>🏍️ Bottol Garage</h1>
+<h1>🏍️ ArappSystem Garage</h1>
 <p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a></p>
 
 <div class="top">
@@ -135,7 +135,7 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 👤 {{r['customer']}} - {{r['phone']}}<br>
 🔧 {{r['masalah']}}<br>
 💰 RM{{r['harga'] or 0}} | Pomen: {{r['pomen'] or '-'}} | Bayar: {{r['bayar']}}
-<a href="https://wa.me/{{r['phone']}}?text=Salam%20{{r['customer']}}%2C%20motor%20{{r['jenis']}}%20{{r['plat']}}%20kau%20DAH%20SIAP!%20Total%20RM{{r['harga']}}%20-%20Bottol%20Garage" target="_blank" style="display:block;background:#25D366;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:8px;">💬 WHATSAPP CUSTOMER</a>
+<a href="https://wa.me/{{r['phone']}}?text=Salam%20{{r['customer']}}%2C%20motor%20{{r['jenis']}}%20{{r['plat']}}%20kau%20DAH%20SIAP!%20Total%20RM{{r['harga']}}%20-%20Arapp%20Garage" target="_blank" style="display:block;background:#25D366;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:8px;">💬 WHATSAPP CUSTOMER</a>
 {% if r['status']=='Masuk' %}
 <form method="post" action="/kerja/{{r['id']}}"><input name="pomen" placeholder="Nama Pomen" required><button class="btn-kerja">🔧 MULA KERJA</button></form>
 {% elif r['status']=='Tengah Buat' %}
@@ -180,7 +180,7 @@ def approve(id):
     else: con.execute("UPDATE motor SET status='Dah Siap' WHERE id=?",(id,))
     con.commit(); con.close()
     harga_final = harga_baru if harga_baru else r['harga']
-    print(f"WHATSAPP TO {r['phone']}: Bos, motor {r['jenis']} {r['plat']} DAH SIAP! Total RM{harga_final} - Bottol Garage")
+    print(f"WHATSAPP TO {r['phone']}: Bos, motor {r['jenis']} {r['plat']} DAH SIAP! Total RM{harga_final} - Arapp Garage")
     return redirect("/")
 
 @app.route("/bayar/<int:id>", methods=["POST"])
