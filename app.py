@@ -60,7 +60,29 @@ SUBSCRIBE_HTML = """
 <a class="btn" href="https://toyyibpay.com/Langanan-Bulanan">💳 BAYAR RM49 SEKARANG</a>
 <a class="btn2" href="https://wa.me/60123456789?text=Salam%20saya%20nak%20subscribe%20Arapp%20Garage%20RM49">📱 WHATSAPP ADMIN - DAH BAYAR</a>
 <p style="font-size:12px;color:#888;margin-top:15px">Lepas bayar, WhatsApp resit kat admin, admin akan aktifkan dalam 5 minit.</p>
-</div></body></html>
+</div><script>
+function copyReport() {
+  let text = "REPORT BOTTOL GARAGE\n";
+  text += "Tarikh: " + new Date().toLocaleDateString('ms-MY') + "\n";
+  text += "--------------------------\n";
+  text += "Motor Hari Ni: {{total}}\n";
+  text += "Dah Siap: {{siap}}\n";
+  text += "Duit Masuk: RM{{duit}}\n";
+  text += "--------------------------\n";
+  text += "PERLU APPROVAL BOSS:\n";
+  {% for r in need_approval %}
+  text += "- {{r['jenis']}} {{r['plat']}} - {{r['masalah']}} - RM{{r['harga']}}\n";
+  {% else %}
+  text += "Tiada approval. Semua clear ✅\n";
+  {% endfor %}
+  text += "--------------------------\n";
+  text += "Dihantar dari ArappSystem Garage";
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById("copyMsg").style.display = "block";
+    setTimeout(()=>{ document.getElementById("copyMsg").style.display="none"; }, 3000);
+  });
+}
+</script></body></html>
 """
 
 @app.route("/subscribe")
@@ -115,6 +137,8 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 <button class="btn-approve">✅ APPROVE & WHATSAPP CUSTOMER</button>
 </form><hr>
 {% else %}<p>Tiada approval. Semua clear ✅</p>{% endfor %}
+<button onclick="copyReport()" style="width:100%; background:#25D366; color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;">📋 COPY REPORT UNTUK WHATSAPP</button>
+<p id="copyMsg" style="text-align:center; color:green; font-weight:bold; display:none;">Dah Copy! Pergi WhatsApp Paste je!</p>
 </div>
 
 <div class="card">
