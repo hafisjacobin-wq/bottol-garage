@@ -103,11 +103,11 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 <div class="top">
 <div><b>{{total}}</b><br>Motor Hari Ni</div>
 <div><b>{{siap}}</b><br>Dah Siap</div>
-<div><b>RM{{duit}}</b><br>Kutip</div>
+<div><b>RM{{duit}}</b><br>Duit \Masuk</div>
 </div>
 
 <div class="card" style="border:2px solid red">
-<h3>🔴 PERLU APPROVAL TOKAY</h3>
+<h3>🔴 PERLU APPROVAL BOSS</h3>
 {% for r in need_approval %}
 <p><b>{{r['jenis']}} {{r['plat']}}</b> - {{r['masalah']}}<br>Harga Pomen: <b>RM{{r['harga']}}</b> - {{r['pomen']}}</p>
 <form method="post" action="/approve/{{r['id']}}">
