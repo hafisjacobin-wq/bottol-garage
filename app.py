@@ -137,7 +137,7 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 <button class="btn-approve">✅ APPROVE & WHATSAPP CUSTOMER</button>
 </form><hr>
 {% else %}<p>Tiada approval. Semua clear ✅</p>{% endfor %}
-<textarea readonly style="width:100%;height:160px;margin-top:10px;padding:10px;">REPORT BOTTOL GARAGE
+<textarea style="width:100%;height:160px;margin-top:10px;padding:10px;">REPORT BOTTOL GARAGE
 Tarikh: {{today}}
 Motor Hari Ni: {{total}}
 Dah Siap: {{siap}}
