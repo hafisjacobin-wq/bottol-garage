@@ -3,7 +3,7 @@ import os, sqlite3
 from datetime import date, timedelta
 
 app = Flask(__name__)
-DB = "ARAPPSYSTEM".db"
+DB = "arapp.db"
 
 def db():
     con = sqlite3.connect(DB)
@@ -27,7 +27,7 @@ def init():
     c = con.execute("SELECT count(*) as c FROM kedai").fetchone()['c']
     if c == 0:
         habis = (date.today() + timedelta(days=7)).isoformat()
-        con.execute("INSERT INTO kedai (nama_kedai, phone, tarikh_habis) VALUES (?,?,?)", ("Bottol Garage", "60123456789", habis))
+        con.execute("INSERT INTO kedai (nama_kedai, phone, tarikh_habis) VALUES (?,?,?)", ("ARAPP SYSTEM", "60123456789", habis))
     con.commit(); con.close()
 init()
 
