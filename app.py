@@ -57,7 +57,7 @@ SUBSCRIBE_HTML = """
 <p>Nak sambung guna untuk kedai lagi?</p>
 <h1 style="font-size:42px">RM49 <span style="font-size:16px">/ Bulan</span></h1>
 <p style="text-align:left">✅ Unlimited Motor Masuk<br>✅ Unlimited Pomen<br>✅ Approval Tokey<br>✅ WhatsApp Customer Auto<br>✅ Rekod Duit Harian</p>
-<a class="btn" href="https://toyyibpay.com/LINK-KAU-GANTI-SINI">💳 BAYAR RM49 SEKARANG</a>
+<a class="btn" href="https://toyyibpay.com/Langanan-Bulanan">💳 BAYAR RM49 SEKARANG</a>
 <a class="btn2" href="https://wa.me/60123456789?text=Salam%20saya%20nak%20subscribe%20Arapp%20Garage%20RM49">📱 WHATSAPP ADMIN - DAH BAYAR</a>
 <p style="font-size:12px;color:#888;margin-top:15px">Lepas bayar, WhatsApp resit kat admin, admin akan aktifkan dalam 5 minit.</p>
 </div></body></html>
