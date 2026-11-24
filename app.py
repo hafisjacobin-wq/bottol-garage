@@ -18,6 +18,12 @@ def init():
         masalah TEXT, harga REAL, status TEXT DEFAULT 'Masuk',
         pomen TEXT, bayar TEXT DEFAULT 'Belum'
     )""")
+        con.execute("""CREATE TABLE IF NOT EXISTS sejarah (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tarikh_tutup TEXT,
+        customer TEXT, phone TEXT, plat TEXT, jenis TEXT,
+        masalah TEXT, harga REAL, pomen TEXT, bayar TEXT
+    )""")
     con.execute("""CREATE TABLE IF NOT EXISTS kedai (
         id INTEGER PRIMARY KEY,
         nama_kedai TEXT, phone TEXT,
