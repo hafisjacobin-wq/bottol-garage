@@ -106,6 +106,23 @@ def aktifkan():
     con.commit(); con.close()
     return f"Siap! Kedai aktif sampai {baru}. <a href='/'>Balik ke App</a>"
 
+@app.route("/tutup_kedai")
+def tutup_kedai():
+    con = db()
+    try:
+        con.execute("INSERT INTO sejarah (no_plat, nama_customer, no_tel, jenis_motor, masalah, harga, tarikh, status) SELECT no_plat, nama_customer, no_tel, jenis_motor, masalah, harga, tarikh, 'Siap - Tutup Kedai' FROM jobs WHERE status != 'Siap'")
+    except:
+        pass
+    try:
+        con.execute("DELETE FROM jobs WHERE status != 'Siap'")
+    except:
+        pass
+    try:
+        con.execute("DELETE FROM sejarah WHERE tarikh < date('now','-90 days')")
+    except:
+        pass
+    con.commit(); con.close()
+    return "Kedai ditutup. Job aktif dipindah ke Sejarah & rekod lama dipadam. <a href='/'>Balik ke App</a>"
 # ================= PAGE UTAMA =================
 HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
