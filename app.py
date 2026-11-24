@@ -137,9 +137,16 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 <button class="btn-approve">✅ APPROVE & WHATSAPP CUSTOMER</button>
 </form><hr>
 {% else %}<p>Tiada approval. Semua clear ✅</p>{% endfor %}
-<button onclick="copyReport()" style="width:100%; background:#25D366; color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;">📋 COPY REPORT UNTUK WHATSAPP</button>
-<p id="copyMsg" style="text-align:center; color:green; font-weight:bold; display:none;">Dah Copy! Pergi WhatsApp Paste je!</p>
-</div>
+<textarea readonly style="width:100%;height:160px;margin-top:10px;padding:10px;">REPORT BOTTOL GARAGE
+Tarikh: {{today}}
+Motor Hari Ni: {{total}}
+Dah Siap: {{siap}}
+Duit Masuk: RM{{duit}}
+PERLU APPROVAL BOSS:
+{% for r in need_approval %}- {{r['jenis']}} {{r['plat']}} - {{r['masalah']}} - RM{{r['harga']}}
+{% else %}Tiada approval. Semua clear
+{% endfor %}Dihantar dari ArappSystem Garage</textarea>
+<p style="font-size:12px;">Tekan lama dalam kotak atas tu, SELECT ALL, COPY, pergi WhatsApp PASTE.</p>
 
 <div class="card">
 <h3>➕ Motor Baru Masuk</h3>
