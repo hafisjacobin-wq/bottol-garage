@@ -18,7 +18,7 @@ def init():
         masalah TEXT, harga REAL, status TEXT DEFAULT 'Masuk',
         pomen TEXT, bayar TEXT DEFAULT 'Belum'
     )""")
-        con.execute("""CREATE TABLE IF NOT EXISTS sejarah (
+    con.execute("""CREATE TABLE IF NOT EXISTS sejarah (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tarikh_tutup TEXT,
         customer TEXT, phone TEXT, plat TEXT, jenis TEXT,
@@ -66,29 +66,7 @@ SUBSCRIBE_HTML = """
 <a class="btn" href="https://toyyibpay.com/Langanan-Bulanan">💳 BAYAR RM49 SEKARANG</a>
 <a class="btn2" href="https://wa.me/60123456789?text=Salam%20saya%20nak%20subscribe%20Arapp%20Garage%20RM49">📱 WHATSAPP ADMIN - DAH BAYAR</a>
 <p style="font-size:12px;color:#888;margin-top:15px">Lepas bayar, WhatsApp resit kat admin, admin akan aktifkan dalam 5 minit.</p>
-</div><script>
-function copyReport() {
-  let text = "REPORT BOTTOL GARAGE\n";
-  text += "Tarikh: " + new Date().toLocaleDateString('ms-MY') + "\n";
-  text += "--------------------------\n";
-  text += "Motor Hari Ni: {{total}}\n";
-  text += "Dah Siap: {{siap}}\n";
-  text += "Duit Masuk: RM{{duit}}\n";
-  text += "--------------------------\n";
-  text += "PERLU APPROVAL BOSS:\n";
-  {% for r in need_approval %}
-  text += "- {{r['jenis']}} {{r['plat']}} - {{r['masalah']}} - RM{{r['harga']}}\n";
-  {% else %}
-  text += "Tiada approval. Semua clear ✅\n";
-  {% endfor %}
-  text += "--------------------------\n";
-  text += "Dihantar dari ArappSystem Garage";
-  navigator.clipboard.writeText(text).then(() => {
-    document.getElementById("copyMsg").style.display = "block";
-    setTimeout(()=>{ document.getElementById("copyMsg").style.display="none"; }, 3000);
-  });
-}
-</script></body></html>
+</div></body></html>
 """
 
 @app.route("/subscribe")
@@ -110,7 +88,7 @@ def aktifkan():
 def delete_all():
     con = db()
     try:
-        con.execute("INSERT INTO sejarah (customer, phone, plat, jenis, masalah, harga, pomen, bayar) SELECT customer, phone, plat, jenis, masalah, harga, pomen, bayar FROM motor")
+        con.execute("INSERT INTO sejarah (tarikh_tutup, customer, phone, plat, jenis, masalah, harga, pomen, bayar) SELECT date('now'), customer, phone, plat, jenis, masalah, harga, pomen, bayar FROM motor")
     except Exception as e:
         print("arkib gagal:", e)
     con.execute("DELETE FROM motor")
@@ -137,12 +115,13 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 .top div{flex:1;background:white;padding:10px;border-radius:10px}
 </style></head><body>
 <h1>🏍️ ArappSystem Garage</h1>
-<p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a>
+<p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a></p>
+<a href="/delete_all" onclick="return confirm('DELETE ALL? Semua job akan pindah ke Arkib!')" style="display:block;background:red;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin:10px 0;">🗑️ DELETE ALL - PINDAH KE ARKIB</a>
 
 <div class="top">
 <div><b>{{total}}</b><br>Motor Hari Ni</div>
 <div><b>{{siap}}</b><br>Dah Siap</div>
-<div><b>RM{{duit}}</b><br>Duit \Masuk</div>
+<div><b>RM{{duit}}</b><br>Duit Masuk</div>
 </div>
 
 <div class="card" style="border:2px solid red">
@@ -154,6 +133,9 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 <button class="btn-approve">✅ APPROVE & WHATSAPP CUSTOMER</button>
 </form><hr>
 {% else %}<p>Tiada approval. Semua clear ✅</p>{% endfor %}
+</div>
+
+<div class="card">
 <textarea style="width:100%;height:160px;margin-top:10px;padding:10px;">REPORT BOTTOL GARAGE
 Tarikh: {{today}}
 Motor Hari Ni: {{total}}
@@ -164,6 +146,7 @@ PERLU APPROVAL BOSS:
 {% else %}Tiada approval. Semua clear
 {% endfor %}Dihantar dari ArappSystem Garage</textarea>
 <p style="font-size:12px;">Tekan lama dalam kotak atas tu, SELECT ALL, COPY, pergi WhatsApp PASTE.</p>
+</div>
 
 <div class="card">
 <h3>➕ Motor Baru Masuk</h3>
@@ -178,7 +161,8 @@ PERLU APPROVAL BOSS:
 
 {% for r in rows %}
 <div class="card">
-<a href="/edit/{{r['id']}}" style="background:#ff9800;color:white;padding:8px 10px;border-radius:8px;text-decoration:none;fonpx;border-radius:8px;text-decoration:none;font-size:13px;font-weight:bold;display:block;BETULKAN</a><a href="/edit/{{r['id']}}" style="display:block;text-align:left;margin-top:0;margin-left:0;padding:10px;"><✏️ EDIT - BETULKAN</a>
+<a href="/edit/{{r['id']}}" style="display:block;background:#ff9800;color:white;text-align:center;padding:10px;border-radius:8px;text-decoration:none;font-weight:bold;">✏️ EDIT - BETULKAN</a>
+<br>
 <b>{{r['jenis']}} - {{r['plat']}}</b><br>
 👤 {{r['customer']}} - {{r['phone']}}<br>
 🔧 {{r['masalah']}}<br>
@@ -206,7 +190,7 @@ def index():
     total=len(rows); siap=len([r for r in rows if r['status']=='Dah Siap'])
     duit=sum([r['harga'] or 0 for r in rows if r['bayar']=='Sudah'])
     con.close()
-    return render_template_string(HTML, rows=rows, need_approval=need, total=total, siap=siap, duit=duit, tarikh_habis=kedai['tarikh_habis'] if kedai else '-')
+    return render_template_string(HTML, rows=rows, need_approval=need, total=total, siap=siap, duit=duit, tarikh_habis=kedai['tarikh_habis'] if kedai else '-', today=date.today().isoformat())
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -234,9 +218,12 @@ def approve(id):
 @app.route("/bayar/<int:id>", methods=["POST"])
 def bayar(id):
     con=db(); con.execute("UPDATE motor SET bayar='Sudah' WHERE id=?",(id,)); con.commit(); con.close(); return redirect("/")
+
 @app.route("/edit/<int:id>")
 def edit(id):
     con=db(); r=con.execute("SELECT * FROM motor WHERE id=?",(id,)).fetchone(); con.close()
+    if not r:
+        return redirect("/")
     return f"""
     <div style="font-family:sans-serif;max-width:500px;margin:20px auto;padding:20px">
     <h2>Edit Motor - {r['customer']}</h2>
@@ -259,9 +246,7 @@ def update(id):
     (request.form.get('customer'), request.form.get('phone'), request.form.get('plat'), request.form.get('jenis'), request.form.get('masalah'), request.form.get('harga'), request.form.get('pomen'), id))
     con.commit(); con.close()
     return redirect("/")
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
