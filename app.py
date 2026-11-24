@@ -53,7 +53,7 @@ SUBSCRIBE_HTML = """
 </style></head><body>
 <div class="box">
 <h1>🏍️ ARAPP SYSTEM Garage</h1>
-<h2 style="color:red">Trial Dah Habis Bro</h2>
+<h2 style="color:red">Trial Dah Habis </h2>
 <p>Nak sambung guna untuk kedai kau?</p>
 <h1 style="font-size:42px">RM49 <span style="font-size:16px">/ Bulan</span></h1>
 <p style="text-align:left">✅ Unlimited Motor Masuk<br>✅ Unlimited Pomen<br>✅ Approval Tokey<br>✅ WhatsApp Customer Auto<br>✅ Rekod Duit Harian</p>
