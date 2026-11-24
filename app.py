@@ -116,22 +116,7 @@ def delete_all():
     con.execute("DELETE FROM motor")
     con.commit(); con.close()
     return "Siap! Semua job dah pindah ke Arkib. <a href='/'>Balik ke App</a>"
-def tutup_kedai():
-    con = db()
-    try:
-        con.execute("INSERT INTO sejarah (no_plat, nama_customer, no_tel, jenis_motor, masalah, harga, tarikh, status) SELECT no_plat, nama_customer, no_tel, jenis_motor, masalah, harga, tarikh, 'Siap - Tutup Kedai' FROM jobs WHERE status != 'Siap'")
-    except:
-        pass
-    try:
-        con.execute("DELETE FROM jobs WHERE status != 'Siap'")
-    except:
-        pass
-    try:
-        con.execute("DELETE FROM sejarah WHERE tarikh < date('now','-90 days')")
-    except:
-        pass
-    con.commit(); con.close()
-    return "Kedai ditutup. Job aktif dipindah ke Sejarah & rekod lama dipadam. <a href='/'>Balik ke App</a>"
+
 # ================= PAGE UTAMA =================
 HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -153,7 +138,6 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 </style></head><body>
 <h1>🏍️ ArappSystem Garage</h1>
 <p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a>
-<a href="/tutup_kedai" onclick="return confirm('TUTUP KEDAI? Semua job aktif akan dipindah ke Sejarah & rekod lama dipadam. Teruskan?')"><button style="background:#d32f2f;color:white">🔒 TUTUP KEDAI - CLEAR SEMUA</button></a></p>
 
 <div class="top">
 <div><b>{{total}}</b><br>Motor Hari Ni</div>
