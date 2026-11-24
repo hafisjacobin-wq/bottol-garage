@@ -29,7 +29,6 @@ def init():
         nama_kedai TEXT, phone TEXT,
         tarikh_habis TEXT, status_bayar TEXT DEFAULT 'Trial'
     )""")
-    # Auto buat 1 kedai trial 7 hari kalau belum ada
     c = con.execute("SELECT count(*) as c FROM kedai").fetchone()['c']
     if c == 0:
         habis = (date.today() + timedelta(days=7)).isoformat()
@@ -43,9 +42,8 @@ def check_subscribe():
     con.close()
     if not k:
         return False
-    # Kalau tarikh hari ni dah lepas tarikh habis = kena bayar
     if str(date.today()) > str(k['tarikh_habis']):
-        return True # True = dah expired
+        return True
     return False
 
 # ================= PAGE SUBSCRIBE =================
@@ -73,8 +71,6 @@ SUBSCRIBE_HTML = """
 def subscribe():
     return SUBSCRIBE_HTML
 
-# Link untuk KAU (owner app) aktifkan kedai orang lepas dia bayar
-# Contoh kau buka: /aktifkan?hari=30
 @app.route("/aktifkan")
 def aktifkan():
     hari = int(request.args.get("hari", 30))
@@ -94,6 +90,40 @@ def delete_all():
     con.execute("DELETE FROM motor")
     con.commit(); con.close()
     return "Siap! Semua job dah pindah ke Arkib. <a href='/'>Balik ke App</a>"
+
+# ================= PAGE ARKIB =================
+@app.route("/arkib")
+def arkib():
+    con = db()
+    rows = con.execute("SELECT * FROM sejarah ORDER BY id DESC").fetchall()
+    total = len(rows)
+    duit = sum([r['harga'] or 0 for r in rows if r['bayar'] == 'Sudah'])
+    con.close()
+    html = f"""
+    <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arkib - ARAPP Garage</title>
+    <style>body{{font-family:sans-serif;background:#f4f4f4;padding:12px;margin:0}}
+    .card{{background:white;padding:14px;border-radius:12px;margin-bottom:10px;box-shadow:0 2px 5px #ddd}}
+    a.btn{{display:block;background:#111;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:10px}}
+    </style></head><body>
+    <h1 style="text-align:center">📦 ARKIB - Motor Lama</h1>
+    <a class="btn" href="/">⬅️ BALIK KE PAGE UTAMA</a>
+    <p style="text-align:center">Total Arkib: <b>{total}</b> | Duit Sudah Bayar: <b>RM{duit}</b></p>
+    """
+    if not rows:
+        html += "<div class='card'><p>Arkib masih kosong. Belum ada motor yang di-delete.</p></div>"
+    for r in rows:
+        html += f"""
+        <div class="card">
+        <b>{r['jenis']} - {r['plat']}</b><br>
+        👤 {r['customer']} - {r['phone']}<br>
+        🔧 {r['masalah']}<br>
+        💰 RM{r['harga'] or 0} | Pomen: {r['pomen'] or '-'} | Bayar: {r['bayar']}<br>
+        📅 Tarikh Tutup: {r['tarikh_tutup'] or '-'}
+        </div>
+        """
+    html += "</body></html>"
+    return html
 
 # ================= PAGE UTAMA =================
 HTML = """
@@ -117,6 +147,7 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 <h1>🏍️ ArappSystem Garage</h1>
 <p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a></p>
 <a href="/delete_all" onclick="return confirm('DELETE ALL? Semua job akan pindah ke Arkib!')" style="display:block;background:red;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin:10px 0;">🗑️ DELETE ALL - PINDAH KE ARKIB</a>
+<a href="/arkib" style="display:block;background:#673ab7;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin:10px 0;">📦 TENGOK ARKIB - Motor Lama</a>
 
 <div class="top">
 <div><b>{{total}}</b><br>Motor Hari Ni</div>
