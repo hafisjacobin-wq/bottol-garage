@@ -3,7 +3,7 @@ import os, sqlite3
 from datetime import date, timedelta
 
 app = Flask(__name__)
-DB = "ARAPP SYSTEM".db"
+DB = "ARAPPSYSTEM".db"
 
 def db():
     con = sqlite3.connect(DB)
