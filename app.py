@@ -126,7 +126,8 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 .top div{flex:1;background:white;padding:10px;border-radius:10px}
 </style></head><body>
 <h1>🏍️ ArappSystem Garage</h1>
-<p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a></p>
+<p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a>
+<a href="/tutup_kedai" onclick="return confirm('TUTUP KEDAI? Semua job aktif akan dipindah ke Sejarah & rekod lama dipadam. Teruskan?')"><button style="background:#d32f2f;color:white">🔒 TUTUP KEDAI - CLEAR SEMUA</button></a></p>
 
 <div class="top">
 <div><b>{{total}}</b><br>Motor Hari Ni</div>
