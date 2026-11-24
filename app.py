@@ -106,7 +106,16 @@ def aktifkan():
     con.commit(); con.close()
     return f"Siap! Kedai aktif sampai {baru}. <a href='/'>Balik ke App</a>"
 
-@app.route("/tutup_kedai")
+@app.route("/delete_all")
+def delete_all():
+    con = db()
+    try:
+        con.execute("INSERT INTO sejarah (customer, phone, plat, jenis, masalah, harga, pomen, bayar) SELECT customer, phone, plat, jenis, masalah, harga, pomen, bayar FROM motor")
+    except Exception as e:
+        print("arkib gagal:", e)
+    con.execute("DELETE FROM motor")
+    con.commit(); con.close()
+    return "Siap! Semua job dah pindah ke Arkib. <a href='/'>Balik ke App</a>"
 def tutup_kedai():
     con = db()
     try:
