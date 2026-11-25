@@ -91,6 +91,21 @@ def delete_all():
     con.commit(); con.close()
     return "Siap! Semua job dah pindah ke Arkib. <a href='/'>Balik ke App</a>"
 
+# ================= BARU: PADAM ARKIB =================
+@app.route("/delete_arkib/<int:id>")
+def delete_arkib(id):
+    con = db()
+    con.execute("DELETE FROM sejarah WHERE id=?", (id,))
+    con.commit(); con.close()
+    return redirect("/arkib")
+
+@app.route("/delete_arkib_all")
+def delete_arkib_all():
+    con = db()
+    con.execute("DELETE FROM sejarah")
+    con.commit(); con.close()
+    return redirect("/arkib")
+
 # ================= PAGE ARKIB =================
 @app.route("/arkib")
 def arkib():
@@ -105,9 +120,12 @@ def arkib():
     <style>body{{font-family:sans-serif;background:#f4f4f4;padding:12px;margin:0}}
     .card{{background:white;padding:14px;border-radius:12px;margin-bottom:10px;box-shadow:0 2px 5px #ddd}}
     a.btn{{display:block;background:#111;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:10px}}
+    a.btn-del{{display:block;background:#e53935;color:white;text-align:center;padding:10px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:10px}}
+    a.btn-del-all{{display:block;background:#b71c1c;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin-bottom:10px}}
     </style></head><body>
     <h1 style="text-align:center">📦 ARKIB - Motor Lama</h1>
     <a class="btn" href="/">⬅️ BALIK KE PAGE UTAMA</a>
+    <a class="btn-del-all" href="/delete_arkib_all" onclick="return confirm('Betul nak PADAM SEMUA Arkib? Tak boleh undo!')">🗑️ PADAM SEMUA ARKIB</a>
     <p style="text-align:center">Total Arkib: <b>{total}</b> | Duit Sudah Bayar: <b>RM{duit}</b></p>
     """
     if not rows:
@@ -120,6 +138,7 @@ def arkib():
         🔧 {r['masalah']}<br>
         💰 RM{r['harga'] or 0} | Pomen: {r['pomen'] or '-'} | Bayar: {r['bayar']}<br>
         📅 Tarikh Tutup: {r['tarikh_tutup'] or '-'}
+        <a class="btn-del" href="/delete_arkib/{r['id']}" onclick="return confirm('Padam {r['plat']} dari Arkib?')">🗑️ PADAM</a>
         </div>
         """
     html += "</body></html>"
