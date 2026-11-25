@@ -232,7 +232,7 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 {% else %}<p>Tiada approval. Semua clear ✅</p>{% endfor %}
 </div>
 <div class="card">
-<textarea style="width:100%;height:160px;margin-top:10px;padding:10px;">REPORT BOTTOL GARAGE
+<textarea style="width:100%;height:160px;margin-top:10px;padding:10px;">REPORT ARAPP DEMO
 Tarikh: {{today}}
 Motor Hari Ni: {{total}}
 Dah Siap: {{siap}}
@@ -240,7 +240,7 @@ Duit Masuk: RM{{duit}}
 PERLU APPROVAL BOSS:
 {% for r in need_approval %}- {{r['jenis']}} {{r['plat']}} - {{r['masalah']}} - RM{{r['harga']}}
 {% else %}Tiada approval. Semua clear
-{% endfor %}Dihantar dari ArappSystem Garage</textarea>
+{% endfor %}Dihantar dari ARAPP DEMO</textarea>
 <p style="font-size:12px;">Tekan lama dalam kotak atas tu, SELECT ALL, COPY, pergi WhatsApp PASTE.</p>
 </div>
 <div class="card">
