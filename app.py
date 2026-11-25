@@ -60,7 +60,7 @@ def check_subscribe():
 # ================= LOGIN =================
 LOGIN_HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login - Bottol Garage</title>
+<title>Login - ARAPP DEMO</title>
 <style>body{font-family:sans-serif;background:#111;padding:16px;margin:0}
 .box{background:white;padding:24px;border-radius:16px;text-align:center;max-width:380px;margin:40px auto}
 input{width:100%;padding:14px;margin:8px 0;border:1px solid #ccc;border-radius:10px;box-sizing:border-box;font-size:16px}
@@ -68,7 +68,7 @@ button{width:100%;padding:14px;background:#111;color:white;border:none;border-ra
 .err{color:red;font-weight:bold}
 </style></head><body>
 <div class="box">
-<h1>🏍️ BOTTOL GARAGE</h1>
+<h1>🏍️ ARAPP DEMO</h1>
 <p>Staff sahaja. Sila login.</p>
 {% if error %}<p class="err">{{error}}</p>{% endif %}
 <form method="post">
