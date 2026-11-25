@@ -1,9 +1,20 @@
-from flask import Flask, request, redirect, render_template_string
+from flask import Flask, request, redirect, render_template_string, session
+from functools import wraps
 import os, sqlite3
 from datetime import date, timedelta
 
 app = Flask(__name__)
+app.secret_key = "arapp-bottol-rahsia-123"
+PASSWORD_KEDAI = "bottol123"
 DB = "arapp.db"
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get("logged_in"):
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated
 
 def db():
     con = sqlite3.connect(DB)
@@ -46,6 +57,44 @@ def check_subscribe():
         return True
     return False
 
+# ================= LOGIN =================
+LOGIN_HTML = """
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login - Bottol Garage</title>
+<style>body{font-family:sans-serif;background:#111;padding:16px;margin:0}
+.box{background:white;padding:24px;border-radius:16px;text-align:center;max-width:380px;margin:40px auto}
+input{width:100%;padding:14px;margin:8px 0;border:1px solid #ccc;border-radius:10px;box-sizing:border-box;font-size:16px}
+button{width:100%;padding:14px;background:#111;color:white;border:none;border-radius:10px;font-weight:bold;font-size:16px}
+.err{color:red;font-weight:bold}
+</style></head><body>
+<div class="box">
+<h1>🏍️ BOTTOL GARAGE</h1>
+<p>Staff sahaja. Sila login.</p>
+{% if error %}<p class="err">{{error}}</p>{% endif %}
+<form method="post">
+<input type="password" name="password" placeholder="Masukkan Password Kedai" required>
+<button>🔓 MASUK</button>
+</form>
+<p style="font-size:12px;color:#888">Lupa password? WhatsApp Admin.</p>
+</div></body></html>
+"""
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        if request.form.get("password") == PASSWORD_KEDAI:
+            session["logged_in"] = True
+            return redirect("/")
+        else:
+            error = "Password salah! Cuba lagi."
+    return render_template_string(LOGIN_HTML, error=error)
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
 # ================= PAGE SUBSCRIBE =================
 SUBSCRIBE_HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -81,6 +130,7 @@ def aktifkan():
     return f"Siap! Kedai aktif sampai {baru}. <a href='/'>Balik ke App</a>"
 
 @app.route("/delete_all")
+@login_required
 def delete_all():
     con = db()
     try:
@@ -91,8 +141,8 @@ def delete_all():
     con.commit(); con.close()
     return "Siap! Semua job dah pindah ke Arkib. <a href='/'>Balik ke App</a>"
 
-# ================= BARU: PADAM ARKIB =================
 @app.route("/delete_arkib/<int:id>")
+@login_required
 def delete_arkib(id):
     con = db()
     con.execute("DELETE FROM sejarah WHERE id=?", (id,))
@@ -100,14 +150,15 @@ def delete_arkib(id):
     return redirect("/arkib")
 
 @app.route("/delete_arkib_all")
+@login_required
 def delete_arkib_all():
     con = db()
     con.execute("DELETE FROM sejarah")
     con.commit(); con.close()
     return redirect("/arkib")
 
-# ================= PAGE ARKIB =================
 @app.route("/arkib")
+@login_required
 def arkib():
     con = db()
     rows = con.execute("SELECT * FROM sejarah ORDER BY id DESC").fetchall()
@@ -144,7 +195,6 @@ def arkib():
     html += "</body></html>"
     return html
 
-# ================= PAGE UTAMA =================
 HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ARAPPSYSTEM Garage</title>
@@ -159,21 +209,18 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 .btn-siap{background:#4caf50;color:white}
 .btn-approve{background:#2196f3;color:white}
 .btn-bayar{background:#111;color:white}
-.badge{padding:4px 8px;border-radius:20px;font-size:12px;color:white}
 .top{display:flex;gap:8px;text-align:center}
 .top div{flex:1;background:white;padding:10px;border-radius:10px}
 </style></head><body>
 <h1>🏍️ ArappSystem Garage</h1>
-<p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a></p>
+<p style="text-align:center;font-size:12px">Aktif sampai: {{tarikh_habis}} | <a href="/subscribe">Subscribe</a> | <a href="/logout">Logout</a></p>
 <a href="/delete_all" onclick="return confirm('DELETE ALL? Semua job akan pindah ke Arkib!')" style="display:block;background:red;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin:10px 0;">🗑️ DELETE ALL - PINDAH KE ARKIB</a>
 <a href="/arkib" style="display:block;background:#673ab7;color:white;text-align:center;padding:12px;border-radius:8px;text-decoration:none;font-weight:bold;margin:10px 0;">📦 TENGOK ARKIB - Motor Lama</a>
-
 <div class="top">
 <div><b>{{total}}</b><br>Motor Hari Ni</div>
 <div><b>{{siap}}</b><br>Dah Siap</div>
 <div><b>RM{{duit}}</b><br>Duit Masuk</div>
 </div>
-
 <div class="card" style="border:2px solid red">
 <h3>🔴 PERLU APPROVAL BOSS</h3>
 {% for r in need_approval %}
@@ -184,7 +231,6 @@ button{width:100%;padding:12px;border:none;border-radius:8px;font-weight:bold;fo
 </form><hr>
 {% else %}<p>Tiada approval. Semua clear ✅</p>{% endfor %}
 </div>
-
 <div class="card">
 <textarea style="width:100%;height:160px;margin-top:10px;padding:10px;">REPORT BOTTOL GARAGE
 Tarikh: {{today}}
@@ -197,7 +243,6 @@ PERLU APPROVAL BOSS:
 {% endfor %}Dihantar dari ArappSystem Garage</textarea>
 <p style="font-size:12px;">Tekan lama dalam kotak atas tu, SELECT ALL, COPY, pergi WhatsApp PASTE.</p>
 </div>
-
 <div class="card">
 <h3>➕ Motor Baru Masuk</h3>
 <form method="post" action="/add">
@@ -208,7 +253,6 @@ PERLU APPROVAL BOSS:
 <textarea name="masalah" placeholder="Apa rosak?"></textarea>
 <button class="btn-add">MASUKKAN MOTOR</button>
 </form></div>
-
 {% for r in rows %}
 <div class="card">
 <a href="/edit/{{r['id']}}" style="display:block;background:#ff9800;color:white;text-align:center;padding:10px;border-radius:8px;text-decoration:none;font-weight:bold;">✏️ EDIT - BETULKAN</a>
@@ -231,6 +275,7 @@ PERLU APPROVAL BOSS:
 """
 
 @app.route("/")
+@login_required
 def index():
     if check_subscribe():
         return redirect("/subscribe")
@@ -243,18 +288,22 @@ def index():
     return render_template_string(HTML, rows=rows, need_approval=need, total=total, siap=siap, duit=duit, tarikh_habis=kedai['tarikh_habis'] if kedai else '-', today=date.today().isoformat())
 
 @app.route("/add", methods=["POST"])
+@login_required
 def add():
     con=db(); con.execute("INSERT INTO motor (customer,phone,plat,jenis,masalah) VALUES (?,?,?,?,?)",(request.form['customer'],request.form['phone'],request.form['plat'],request.form['jenis'],request.form['masalah'])); con.commit(); con.close(); return redirect("/")
 
 @app.route("/kerja/<int:id>", methods=["POST"])
+@login_required
 def kerja(id):
     con=db(); con.execute("UPDATE motor SET status='Tengah Buat', pomen=? WHERE id=?",(request.form['pomen'],id)); con.commit(); con.close(); return redirect("/")
 
 @app.route("/siap/<int:id>", methods=["POST"])
+@login_required
 def siap(id):
     con=db(); con.execute("UPDATE motor SET status='Tunggu Approval', harga=? WHERE id=?",(request.form['harga'],id)); con.commit(); con.close(); return redirect("/")
 
 @app.route("/approve/<int:id>", methods=["POST"])
+@login_required
 def approve(id):
     harga_baru=request.form.get('harga_baru')
     con=db(); r=con.execute("SELECT * FROM motor WHERE id=?",(id,)).fetchone()
@@ -266,10 +315,12 @@ def approve(id):
     return redirect("/")
 
 @app.route("/bayar/<int:id>", methods=["POST"])
+@login_required
 def bayar(id):
     con=db(); con.execute("UPDATE motor SET bayar='Sudah' WHERE id=?",(id,)); con.commit(); con.close(); return redirect("/")
 
 @app.route("/edit/<int:id>")
+@login_required
 def edit(id):
     con=db(); r=con.execute("SELECT * FROM motor WHERE id=?",(id,)).fetchone(); con.close()
     if not r:
@@ -291,6 +342,7 @@ def edit(id):
     """
 
 @app.route("/update/<int:id>", methods=["POST"])
+@login_required
 def update(id):
     con=db(); con.execute("UPDATE motor SET customer=?, phone=?, plat=?, jenis=?, masalah=?, harga=?, pomen=? WHERE id=?",
     (request.form.get('customer'), request.form.get('phone'), request.form.get('plat'), request.form.get('jenis'), request.form.get('masalah'), request.form.get('harga'), request.form.get('pomen'), id))
