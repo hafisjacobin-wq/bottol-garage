@@ -1,36 +1,58 @@
-from flask import Flask, request, redirect, render_template_string, session
-from functools import wraps
-import os, sqlite3
+import os
+from flask import Flask, render_template_string, request, redirect, url_for, session, jsonify
 from datetime import date, timedelta
+import calendar
 
 app = Flask(__name__)
-app.secret_key = "arapp-bottol-rahsia-123"
-PASSWORD_KEDAI = "bottol123"
-DB = "arapp.db"
+app.secret_key = "arapp-secret"
 
-def login_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if not session.get("logged_in"):
-            return redirect("/login")
-        return f(*args, **kwargs)
-    return decorated
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+# --- Postgres wrapper supaya code lama yang pakai ? terus jalan ---
+import psycopg2
+import psycopg2.extras
+
+class CursorWrapper:
+    def __init__(self, cur):
+        self.cur = cur
+    def fetchone(self):
+        return self.cur.fetchone()
+    def fetchall(self):
+        return self.cur.fetchall()
+    def __iter__(self):
+        return iter(self.cur.fetchall())
+
+class PGConn:
+    def __init__(self):
+        self.conn = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+        self.conn.autocommit = False
+    def execute(self, sql, params=()):
+        # tukar ? sqlite -> %s postgres
+        sql2 = sql.replace("?", "%s")
+        cur = self.conn.cursor()
+        cur.execute(sql2, params)
+        return CursorWrapper(cur)
+    def commit(self):
+        self.conn.commit()
+    def close(self):
+        try:
+            self.conn.close()
+        except:
+            pass
 
 def db():
-    con = sqlite3.connect(DB)
-    con.row_factory = sqlite3.Row
-    return con
+    return PGConn()
 
 def init():
     con = db()
     con.execute("""CREATE TABLE IF NOT EXISTS motor (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         customer TEXT, phone TEXT, plat TEXT, jenis TEXT,
         masalah TEXT, harga REAL, status TEXT DEFAULT 'Masuk',
         pomen TEXT, bayar TEXT DEFAULT 'Belum'
     )""")
     con.execute("""CREATE TABLE IF NOT EXISTS sejarah (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         tarikh_tutup TEXT,
         customer TEXT, phone TEXT, plat TEXT, jenis TEXT,
         masalah TEXT, harga REAL, pomen TEXT, bayar TEXT
@@ -45,6 +67,7 @@ def init():
         habis = (date.today() + timedelta(days=7)).isoformat()
         con.execute("INSERT INTO kedai (nama_kedai, phone, tarikh_habis) VALUES (?,?,?)", ("ARAPP SYSTEM", "60123456789", habis))
     con.commit(); con.close()
+
 init()
 
 def check_subscribe():
