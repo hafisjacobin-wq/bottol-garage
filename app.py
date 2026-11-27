@@ -73,7 +73,7 @@ def init():
         masalah TEXT, harga REAL, pomen TEXT, bayar TEXT
     )""")
     con.execute("""CREATE TABLE IF NOT EXISTS kedai (
-        id INTEGER PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         nama_kedai TEXT, phone TEXT,
         tarikh_habis TEXT, status_bayar TEXT DEFAULT 'Trial'
     )""")
