@@ -1,17 +1,23 @@
 import os
-from flask import Flask, render_template_string, request, redirect, url_for, session, jsonify
+from functools import wraps
+from flask import Flask, render_template_string, request, redirect, url_for, session
 from datetime import date, timedelta
-import calendar
-
-app = Flask(__name__)
-app.secret_key = "arapp-secret"
-
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-# --- Postgres wrapper supaya code lama yang pakai ? terus jalan ---
 import psycopg2
 import psycopg2.extras
 
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "arapp-secret")
+
+# --- SUPABASE CONFIG ---
+# Project kau
+SUPABASE_URL = "https://xiqgjuuphoveldhwbmhr.supabase.co"
+SUPABASE_PUBLISHABLE_KEY = "sb_publishable_0FUvZd7_nHu87aI8J7wVOA_8Fl5IMps"
+
+# Database URL dari Supabase > Project Settings > Database > Connection string
+DATABASE_URL = os.environ.get("DATABASE_URL")
+PASSWORD_KEDAI = os.environ.get("PASSWORD_KEDAI", "1234")  # Tukar password login kedai kat sini / Env
+
+# --- Postgres wrapper ---
 class CursorWrapper:
     def __init__(self, cur):
         self.cur = cur
@@ -24,10 +30,11 @@ class CursorWrapper:
 
 class PGConn:
     def __init__(self):
+        if not DATABASE_URL:
+            raise Exception("DATABASE_URL tak set! Set kat Render / Railway / Env")
         self.conn = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
         self.conn.autocommit = False
     def execute(self, sql, params=()):
-        # tukar ? sqlite -> %s postgres
         sql2 = sql.replace("?", "%s")
         cur = self.conn.cursor()
         cur.execute(sql2, params)
@@ -42,6 +49,14 @@ class PGConn:
 
 def db():
     return PGConn()
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get("logged_in"):
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated
 
 def init():
     con = db()
@@ -118,7 +133,7 @@ def logout():
     session.clear()
     return redirect("/login")
 
-# ================= PAGE SUBSCRIBE =================
+# ================= SUBSCRIBE =================
 SUBSCRIBE_HTML = """
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ARAPP SYSTEM Garage - Subscribe</title>
@@ -129,7 +144,7 @@ SUBSCRIBE_HTML = """
 </style></head><body>
 <div class="box">
 <h1>🏍️ ARAPP SYSTEM Garage</h1>
-<h2 style="color:red">Trial Dah Habis </h2>
+<h2 style="color:red">Trial Dah Habis</h2>
 <p>Nak sambung guna untuk kedai lagi?</p>
 <h1 style="font-size:42px">RM49 <span style="font-size:16px">/ Bulan</span></h1>
 <p style="text-align:left">✅ Unlimited Motor Masuk<br>✅ Unlimited Pomen<br>✅ Approval Tokey<br>✅ WhatsApp Customer Auto<br>✅ Rekod Duit Harian</p>
