@@ -58,6 +58,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated
 
+def login_required...
+    ...
+    return decorated
+
 def init():
     con = db()
     con.execute("""CREATE TABLE IF NOT EXISTS motor (
@@ -77,6 +81,10 @@ def init():
         nama_kedai TEXT, phone TEXT,
         tarikh_habis TEXT, status_bayar TEXT DEFAULT 'Trial'
     )""")
+    for tbl in ["motor", "sejarah", "kedai"]:
+        con.execute(f"CREATE SEQUENCE IF NOT EXISTS {tbl}_id_seq")
+        con.execute(f"ALTER TABLE {tbl} ALTER COLUMN id SET DEFAULT nextval('{tbl}_id_seq')")
+        con.execute(f"SELECT setval('{tbl}_id_seq', COALESCE((SELECT MAX(id) FROM {tbl}), 1))")
     c = con.execute("SELECT count(*) as c FROM kedai").fetchone()['c']
     if c == 0:
         habis = (date.today() + timedelta(days=7)).isoformat()
